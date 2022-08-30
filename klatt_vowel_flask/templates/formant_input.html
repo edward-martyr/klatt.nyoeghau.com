@@ -1,7 +1,14 @@
 <div class="formant_input">
-    <input type="range" min="{{ min }}" max="{{ max }}" name="f{{ formant }}" id="formant_input_{{ formant }}"
-        value="{{ default_value }}" onchange="formant_value_{{ formant }}.value = this.value"
-        oninput="formant_value_{{ formant }}.value = this.value" />
-    <label class="formant_output" for="formant_input_{{ formant }}">F{{ formant }} = <output
-            id="formant_value_{{ formant }}">{{ default_value }}</output></label>
+    <label class="formant_tick" id="f{{ formant }}_min_tick" data-name="{{ formant }}" for="formant_input_{{ formant }}">{{ default_value.min }}
+    </label>
+    <input class="formant_input_range" type="range" min="{{ default_value.min }}" max="{{ default_value.max }}"
+        name="f{{ formant }}" id="formant_input_{{ formant }}" value="{{ default_value.default }}"
+        list="tickmarks_{{ formant }}" />
+    <label class="formant_tick" id="f{{ formant }}_max_tick" data-name="{{ formant }}" for="formant_input_{{ formant }}">{{ default_value.max }}
+    </label>
+    <label class="formant_output" for="formant_input_{{ formant }}">F{{ formant }} =
+        <input type="number" min="{{ default_value.min }}" max="{{ default_value.max }}"
+            id="formant_value_{{ formant }}" value="{{ default_value.default }}"
+            onchange="formant_input_{{ formant }}.value = this.value; formant_input_{{ formant }}.dispatchEvent(new Event('change'))"></input>
+    </label>
 </div>

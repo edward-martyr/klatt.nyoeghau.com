@@ -3,17 +3,17 @@
 {% block content %}
 <h1>Klatt Grid Vowel Synthesis</h1>
 
-<form method="POST" action="{{ url_for('index') }}">
+<form id="formants_form">
     {% autoescape false %}
     {{ formant_inputs }}
     {% endautoescape %}
-    <input type="submit" class="btn" value="Generate" />
+    <input type="button" class="btn" id="formants_button" value="Play" />
 </form>
 
-{% if folder %}
-<audio preload="none" controls autoplay>
-    <source src="/wav/{{ folder }}" />
-</audio>
-{% endif %}
+<div id="audio"></div>
 
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}
