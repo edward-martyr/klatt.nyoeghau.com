@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Klatt Grid Vowel Synthesis</h1>
+
+<form method="POST" action="{{ url_for('index') }}">
+    {% autoescape false %}
+    {{ formant_inputs }}
+    {% endautoescape %}
+    <input type="submit" class="btn" value="Generate" />
+</form>
+
+{% if folder %}
+<audio preload="none" controls autoplay>
+    <source src="/wav/{{ folder }}" />
+</audio>
+{% endif %}
+
+{% endblock %}

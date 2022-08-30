@@ -1,0 +1,18 @@
+main {
+  padding: 5% 10%;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0 0 2rem 0;
+}
+
+.formant_input {
+  display: block;
+  margin: 0.4rem 0 1.2rem 0;
+}
+
+.formant_output {
+  margin-left: 0.4rem;
+}

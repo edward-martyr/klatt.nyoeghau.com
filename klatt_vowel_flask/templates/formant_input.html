@@ -1,0 +1,7 @@
+<div class="formant_input">
+    <input type="range" min="{{ min }}" max="{{ max }}" name="f{{ formant }}" id="formant_input_{{ formant }}"
+        value="{{ default_value }}" onchange="formant_value_{{ formant }}.value = this.value"
+        oninput="formant_value_{{ formant }}.value = this.value" />
+    <label class="formant_output" for="formant_input_{{ formant }}">F{{ formant }} = <output
+            id="formant_value_{{ formant }}">{{ default_value }}</output></label>
+</div>

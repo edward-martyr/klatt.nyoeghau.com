@@ -1,0 +1,3 @@
+Flask~=2.2
+praat-parselmouth~=0.4
+numpy>=1,<2
