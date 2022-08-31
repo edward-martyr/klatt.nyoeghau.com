@@ -7,17 +7,48 @@ function uuid4() {
   );
 }
 
+const audioCtx = new AudioContext();
+
 const formants_form = document.getElementById("formants_form");
 const formants_button = document.getElementById("formants_button");
-const audio = document.getElementById("audio");
+const wav_play_button = document.getElementById("wav_play_button");
 
-formants_button.addEventListener("click", (e) => {
+const when_loading = () => {
+  document.body.style.cursor = "progress";
+  formants_button.style.cursor = "progress";
+  wav_play_button.style.cursor = "progress";
+};
+
+const not_loading = () => {
+  document.body.style.cursor = "default";
+  formants_button.style.cursor = "pointer";
+  wav_play_button.style.cursor = "pointer";
+};
+
+const formants_button_event = (e) => {
   const uuid = uuid4();
   const urlSearchParams = new URLSearchParams(new FormData(formants_form));
+  when_loading();
   fetch(`/process/${uuid}?${urlSearchParams}`).then((response) => {
-    audio.innerHTML = `<audio autoplay><source src="/wav/${uuid}" type="audio/wav"></audio>`;
+    fetch(`/wav/${uuid}`)
+      .then((response) => response.arrayBuffer())
+      .then((arrayBuffer) => audioCtx.decodeAudioData(arrayBuffer))
+      .then((decodedAudioData) => {
+        const audio_data = decodedAudioData;
+        function play_audio() {
+          const source = audioCtx.createBufferSource();
+          source.buffer = audio_data;
+          source.connect(audioCtx.destination);
+          source.start(0);
+        }
+        // play_audio();
+        not_loading();
+        wav_play_button.hidden = false;
+        wav_play_button.onclick = play_audio;
+      });
   });
-});
+};
+formants_button.addEventListener("click", formants_button_event);
 
 const formant_input_ranges = document.getElementsByClassName(
   "formant_input_range"
@@ -57,6 +88,5 @@ for (let i = 0; i < formant_input_ranges.length; i++) {
     }
   };
 
-  formant_input_range.addEventListener("change", eventListener);
   formant_input_range.addEventListener("input", eventListener);
 }

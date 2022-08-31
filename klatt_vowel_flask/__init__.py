@@ -4,7 +4,7 @@ from pathlib import Path
 from shutil import rmtree
 from typing import NamedTuple
 
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, Response, render_template, request, send_from_directory
 from flask_minify import Minify
 
 from .utils import create_klattgrid_from_vowel, klattgrid_to_sound, save_sound_as_wav
@@ -14,7 +14,7 @@ Minify(app=app, html=True, js=True, cssless=True, static=True)
 app.secret_key = environ.get("SECRET_KEY", "dev")
 
 WAV_FILE_NAME = "audio.wav"
-TMP_FOLDER = Path(app.root_path, ".tmp").resolve()
+CACHE_FOLDER = Path(app.root_path, ".klatt_cache").resolve()
 
 
 class FormantDefaultValue(NamedTuple):
@@ -24,9 +24,9 @@ class FormantDefaultValue(NamedTuple):
 
 
 FORMANT_DEFAULTS = {
-    1: FormantDefaultValue(800, 150, 1500),
-    2: FormantDefaultValue(1200, 750, 3000),
-    3: FormantDefaultValue(2300, 1500, 4000),
+    1: FormantDefaultValue(800, 100, 1500),
+    2: FormantDefaultValue(1200, 500, 4000),
+    3: FormantDefaultValue(2300, 1000, 4500),
     # 4: 2800,
 }
 FORMANT_NUMBER_RANGE = sorted(FORMANT_DEFAULTS.keys())
@@ -47,30 +47,48 @@ def index():
 
 @app.route("/process/<uuid>")
 def process(uuid: str):
-    json_response = {"uuid": uuid}
     try:
-        formants = (float(request.args.get(f"f{i}", 0)) for i in FORMANT_NUMBER_RANGE)
-        klatt_grid = create_klattgrid_from_vowel(*formants)
-        audio = klattgrid_to_sound(klatt_grid)
+        if request.referrer == request.root_url:
+            formants = (
+                float(request.args.get(f"f{i}", 0)) for i in FORMANT_NUMBER_RANGE
+            )
+            klatt_grid = create_klattgrid_from_vowel(*formants)
+            audio = klattgrid_to_sound(klatt_grid)
 
-        tmp_folder = TMP_FOLDER / uuid
-        tmp_folder.mkdir(parents=True, exist_ok=True)
-        save_path = tmp_folder / WAV_FILE_NAME
+            tmp_folder = CACHE_FOLDER / uuid
+            tmp_folder.mkdir(parents=True, exist_ok=True)
+            save_path = tmp_folder / WAV_FILE_NAME
 
-        save_sound_as_wav(audio, save_path.as_posix())
-
-        return json_response | {"success": True}
-    except:
-        return json_response | {"success": False}
+            save_sound_as_wav(audio, save_path.as_posix())
+    except Exception as e:
+        app.logger.error(
+            f"{e}. Error processing request for {uuid}, {request.args}.", exc_info=True
+        )
+    finally:
+        return "", 204
 
 
 @app.route("/wav/<uuid>")
 def wav_file(uuid: str):
-    tmp_folder = TMP_FOLDER / uuid
+    tmp_folder = CACHE_FOLDER / uuid
+    wav_file_name = tmp_folder / WAV_FILE_NAME
     try:
-        return send_from_directory(tmp_folder, WAV_FILE_NAME)
-    finally:
-        rmtree(tmp_folder)
+        wav_file = open(wav_file_name, "rb")
+    except FileNotFoundError:
+        return "Audio already deleted from cache.", 404
+
+    def stream_and_remove_wav_file():
+        try:
+            yield from wav_file
+        finally:
+            wav_file.close()
+            rmtree(tmp_folder)
+
+    return Response(
+        stream_and_remove_wav_file(),
+        mimetype="audio/wav",
+        headers={"Content-Disposition": "attachment", "filename": wav_file_name.name},
+    )
 
 
 @app.route("/favicon.ico")

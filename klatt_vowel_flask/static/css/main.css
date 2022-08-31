@@ -36,6 +36,7 @@ h1 {
   margin-left: 0.4rem;
 }
 
-#formants_button{
+#formants_button, #wav_play_button {
   margin-left: 2rem;
+  margin-bottom: 1rem;
 }
