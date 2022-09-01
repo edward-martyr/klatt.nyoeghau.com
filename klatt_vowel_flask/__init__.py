@@ -1,3 +1,4 @@
+from functools import wraps
 from numbers import Real
 from os import environ
 from pathlib import Path
@@ -10,12 +11,27 @@ from werkzeug.urls import url_parse
 
 from .utils import create_klattgrid_from_vowel, klattgrid_to_sound, save_sound_as_wav
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=None)
 Minify(app=app, html=True, js=True, cssless=True, static=True)
 app.secret_key = environ.get("SECRET_KEY", "dev")
 
-WAV_FILE_NAME = "audio.wav"
+STATIC_FOLDER = Path(app.root_path, "static")
 CACHE_FOLDER = Path(app.root_path, ".klatt_cache").resolve()
+WAV_FILE_NAME = "audio.wav"
+
+
+def reject_outside_referrers(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if (
+            request.referrer is None
+            or url_parse(request.referrer).ascii_host
+            != url_parse(request.root_url).ascii_host
+        ):
+            abort(403, description="Invalid referrer.")
+        return func(*args, **kwargs)
+
+    return wrapper
 
 
 class FormantDefaultValue(NamedTuple):
@@ -47,33 +63,25 @@ def index():
 
 
 @app.route("/process/<uuid>")
+@reject_outside_referrers
 def process(uuid: str):
-    if (
-        request.referrer is not None
-        and url_parse(request.referrer).ascii_host
-        == url_parse(request.root_url).ascii_host
-    ):
-        try:
-            formants = (
-                float(request.args.get(f"f{i}", 0)) for i in FORMANT_NUMBER_RANGE
-            )
-            klatt_grid = create_klattgrid_from_vowel(*formants)
-            audio = klattgrid_to_sound(klatt_grid)
+    try:
+        formants = (float(request.args.get(f"f{i}", 0)) for i in FORMANT_NUMBER_RANGE)
+        klatt_grid = create_klattgrid_from_vowel(*formants)
+        audio = klattgrid_to_sound(klatt_grid)
 
-            tmp_folder = CACHE_FOLDER / uuid
-            tmp_folder.mkdir(parents=True, exist_ok=True)
-            save_path = tmp_folder / WAV_FILE_NAME
+        tmp_folder = CACHE_FOLDER / uuid
+        tmp_folder.mkdir(parents=True, exist_ok=True)
+        save_path = tmp_folder / WAV_FILE_NAME
 
-            save_sound_as_wav(audio, save_path.as_posix())
-        except Exception as e:
-            app.logger.error(
-                f"{e}. Error processing request for {uuid}, {request.args}.",
-                exc_info=True,
-            )
-        finally:
-            return "", 204
-    else:
-        abort(403, description="Invalid referrer.")
+        save_sound_as_wav(audio, save_path.as_posix())
+    except Exception as e:
+        app.logger.error(
+            f"{e}. Error processing request for {uuid}, {request.args}.",
+            exc_info=True,
+        )
+    finally:
+        return "", 204
 
 
 @app.route("/wav/<uuid>")
@@ -99,10 +107,16 @@ def wav_file(uuid: str):
     )
 
 
+@app.route("/static/<path:filename>")
+@reject_outside_referrers
+def static(filename: str):
+    return send_from_directory(STATIC_FOLDER, filename)
+
+
 @app.route("/favicon.ico")
 def favicon():
     return send_from_directory(
-        Path(app.root_path, "static"),
+        STATIC_FOLDER,
         "favicon.ico",
         mimetype="image/vnd.microsoft.icon",
     )
