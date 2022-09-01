@@ -1,5 +1,5 @@
 Flask~=2.2
 praat-parselmouth~=0.4
-numpy~=1
+numpy>=1,<2
 Flask-Minify~=0.39
 Flask-Compress~=1.12
