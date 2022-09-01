@@ -56,7 +56,9 @@ const formant_input_ranges = document.getElementsByClassName(
 
 for (let i = 0; i < formant_input_ranges.length; i++) {
   const formant_input_range = formant_input_ranges[i];
-  const f = formant_input_range.name[formant_input_range.name.length - 1];
+  const f = new Number(
+    formant_input_range.name[formant_input_range.name.length - 1]
+  );
   const formant_value = document.getElementById(`formant_value_${f}`);
 
   const eventListener = (e) => {
@@ -68,20 +70,23 @@ for (let i = 0; i < formant_input_ranges.length; i++) {
     for (let j = 0; j < formant_input_ranges.length; j++) {
       if (i !== j) {
         const formant_input_range_2 = formant_input_ranges[j];
-        const f2 =
-          formant_input_range_2.name[formant_input_range_2.name.length - 1];
+        const f2 = new Number(
+          formant_input_range_2.name[formant_input_range_2.name.length - 1]
+        );
         const formant_input_range_2_value = new Number(
           formant_input_range_2.value
         );
+        const update_other_formant_input = () => {
+          formant_input_range_2.value = self.value;
+          formant_input_range_2.dispatchEvent(new Event("input"));
+        };
         if (f < f2) {
           if (self.value > formant_input_range_2_value) {
-            formant_input_range_2.value = self.value;
-            formant_input_range_2.dispatchEvent(new Event("input"));
+            update_other_formant_input();
           }
         } else if (f > f2) {
           if (self.value < formant_input_range_2_value) {
-            formant_input_range_2.value = self.value;
-            formant_input_range_2.dispatchEvent(new Event("input"));
+            update_other_formant_input();
           }
         }
       }

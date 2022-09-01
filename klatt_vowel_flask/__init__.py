@@ -4,8 +4,9 @@ from pathlib import Path
 from shutil import rmtree
 from typing import NamedTuple
 
-from flask import Flask, Response, render_template, request, send_from_directory
+from flask import Flask, Response, abort, render_template, request, send_from_directory
 from flask_minify import Minify
+from werkzeug.urls import url_parse
 
 from .utils import create_klattgrid_from_vowel, klattgrid_to_sound, save_sound_as_wav
 
@@ -47,8 +48,12 @@ def index():
 
 @app.route("/process/<uuid>")
 def process(uuid: str):
-    try:
-        if request.referrer == request.root_url:
+    if (
+        request.referrer is not None
+        and url_parse(request.referrer).ascii_host
+        == url_parse(request.root_url).ascii_host
+    ):
+        try:
             formants = (
                 float(request.args.get(f"f{i}", 0)) for i in FORMANT_NUMBER_RANGE
             )
@@ -60,12 +65,15 @@ def process(uuid: str):
             save_path = tmp_folder / WAV_FILE_NAME
 
             save_sound_as_wav(audio, save_path.as_posix())
-    except Exception as e:
-        app.logger.error(
-            f"{e}. Error processing request for {uuid}, {request.args}.", exc_info=True
-        )
-    finally:
-        return "", 204
+        except Exception as e:
+            app.logger.error(
+                f"{e}. Error processing request for {uuid}, {request.args}.",
+                exc_info=True,
+            )
+        finally:
+            return "", 204
+    else:
+        abort(403, description="Invalid referrer.")
 
 
 @app.route("/wav/<uuid>")
@@ -75,7 +83,7 @@ def wav_file(uuid: str):
     try:
         wav_file = open(wav_file_name, "rb")
     except FileNotFoundError:
-        return "Audio already deleted from cache.", 404
+        return abort(410, description="Requested item already deleted from cache.")
 
     def stream_and_remove_wav_file():
         try:
