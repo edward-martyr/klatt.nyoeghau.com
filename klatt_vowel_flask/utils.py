@@ -17,7 +17,7 @@ def create_klattgrid_from_vowel(
     b2: Real = 50,
     b3: Real = 100,
     vowel_name: str = "V",
-    duration: Real = 0.6,
+    duration: Real = 0.5,
     pitch: Real = 120,
     bandwidth_fraction: Real = 0.05,
     formant_frequency_interval: Real = 1000,
