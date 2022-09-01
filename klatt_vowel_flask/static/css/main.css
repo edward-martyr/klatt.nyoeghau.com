@@ -3,13 +3,18 @@
 }
 
 main {
-  padding: 5% 10%;
+  max-width: min(70%, 960px);
+  margin: 5% auto;
 }
 
 h1 {
   font-size: 2.5rem;
   font-weight: bold;
   margin: 0 0 2rem 0;
+}
+
+#all_formants_sliders_and_labels {
+  margin-left: -2rem;
 }
 
 .formant_tick {
@@ -23,8 +28,6 @@ h1 {
 
 .formant_input_range {
   width: max(20%, 10rem);
-  min-width: 20%;
-  max-width: 40%;
 }
 
 .formant_input {
@@ -38,7 +41,7 @@ h1 {
 
 #formants_button,
 #wav_play_button {
-  margin-left: 2rem;
+  margin-left: 0.2rem;
   margin-bottom: 1rem;
   width: max(20%, 10rem);
 }

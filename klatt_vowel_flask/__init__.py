@@ -6,12 +6,14 @@ from shutil import rmtree
 from typing import NamedTuple
 
 from flask import Flask, Response, abort, render_template, request, send_from_directory
+from flask_compress import Compress
 from flask_minify import Minify
 from werkzeug.urls import url_parse
 
 from .utils import create_klattgrid_from_vowel, klattgrid_to_sound, save_sound_as_wav
 
 app = Flask(__name__, static_folder=None)
+Compress(app)
 Minify(app=app, html=True, js=True, cssless=True, static=True)
 app.secret_key = environ.get("SECRET_KEY", "dev")
 
@@ -65,6 +67,7 @@ def index():
 @app.route("/process/<uuid>")
 @reject_outside_referrers
 def process(uuid: str):
+    json_response = {}  # {"uuid": uuid, "args": request.args}
     try:
         formants = (float(request.args.get(f"f{i}", 0)) for i in FORMANT_NUMBER_RANGE)
         klatt_grid = create_klattgrid_from_vowel(*formants)
@@ -75,13 +78,14 @@ def process(uuid: str):
         save_path = tmp_folder / WAV_FILE_NAME
 
         save_sound_as_wav(audio, save_path.as_posix())
+
+        return json_response | {"success": True}, 201  # , {"Location": f"/wav/{uuid}"}
     except Exception as e:
         app.logger.error(
             f"{e}. Error processing request for {uuid}, {request.args}.",
             exc_info=True,
         )
-    finally:
-        return "", 204
+        return json_response | {"success": False}, 500
 
 
 @app.route("/wav/<uuid>")

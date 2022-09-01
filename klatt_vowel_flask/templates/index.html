@@ -4,10 +4,12 @@
 <h1>Klatt Grid Vowel Synthesis</h1>
 
 <form id="formants_form">
-    {% autoescape false %}
-    {{ formant_inputs }}
-    {% endautoescape %}
-    <button type="button" class="btn btn-primary" id="formants_button">Synthesise</button>
+    <div id="all_formants_sliders_and_labels">
+        {% autoescape false %}
+        {{ formant_inputs }}
+        {% endautoescape %}
+    </div>
+    <button type="button" class="btn btn-dark" id="formants_button">Synthesise</button>
     <button type="button" class="btn btn-primary" id="wav_play_button" disabled>Play</button>
 </form>
 
