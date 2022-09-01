@@ -7,8 +7,8 @@
     {% autoescape false %}
     {{ formant_inputs }}
     {% endautoescape %}
-    <input type="button" class="btn" id="formants_button" value="Synthesise" />
-    <input type="button" class="btn" id="wav_play_button" value="Play"></div>
+    <button type="button" class="btn btn-primary" id="formants_button">Synthesise</button>
+    <button type="button" class="btn btn-primary" id="wav_play_button" disabled>Play</button>
 </form>
 
 {% endblock %}

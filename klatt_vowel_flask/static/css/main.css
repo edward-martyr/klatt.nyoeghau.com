@@ -7,7 +7,6 @@ main {
 }
 
 h1 {
-  /* font-family: "Palatino"; */
   font-size: 2.5rem;
   font-weight: bold;
   margin: 0 0 2rem 0;
@@ -23,6 +22,7 @@ h1 {
 }
 
 .formant_input_range {
+  width: max(20%, 10rem);
   min-width: 20%;
   max-width: 40%;
 }
@@ -36,7 +36,13 @@ h1 {
   margin-left: 0.4rem;
 }
 
-#formants_button, #wav_play_button {
+#formants_button,
+#wav_play_button {
   margin-left: 2rem;
   margin-bottom: 1rem;
+  width: max(20%, 10rem);
+}
+
+#wav_play_button:disabled {
+  cursor: not-allowed;
 }

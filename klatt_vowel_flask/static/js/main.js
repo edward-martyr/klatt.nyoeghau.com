@@ -12,17 +12,27 @@ const audioCtx = new AudioContext();
 const formants_form = document.getElementById("formants_form");
 const formants_button = document.getElementById("formants_button");
 const wav_play_button = document.getElementById("wav_play_button");
+const loading_spinner = document.getElementById("loading_spinner");
 
 const when_loading = () => {
   document.body.style.cursor = "progress";
   formants_button.style.cursor = "progress";
   wav_play_button.style.cursor = "progress";
+  formants_button.disabled = true;
+  wav_play_button.disabled = true;
+
+  formants_button.innerHTML = `<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+  <span class="sr-only">Loading...</span>`;
 };
 
 const not_loading = () => {
   document.body.style.cursor = "default";
   formants_button.style.cursor = "pointer";
   wav_play_button.style.cursor = "pointer";
+  formants_button.disabled = false;
+  wav_play_button.disabled = false;
+
+  formants_button.innerHTML = "Synthesise";
 };
 
 const formants_button_event = (e) => {
