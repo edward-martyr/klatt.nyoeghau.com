@@ -64,7 +64,7 @@ def index():
     return render_template("index.html", formant_inputs=formant_inputs)
 
 
-@app.route("/process/<uuid>")
+@app.route("/process/<path:uuid>")
 @reject_outside_referrers
 def process(uuid: str):
     json_response = {}  # {"uuid": uuid, "args": request.args}
@@ -88,7 +88,7 @@ def process(uuid: str):
         return json_response | {"success": False}, 500
 
 
-@app.route("/wav/<uuid>")
+@app.route("/wav/<path:uuid>")
 def wav_file(uuid: str):
     tmp_folder = CACHE_FOLDER / uuid
     wav_file_name = tmp_folder / WAV_FILE_NAME
