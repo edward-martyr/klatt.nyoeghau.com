@@ -22,7 +22,7 @@ const when_loading = () => {
   wav_play_button.disabled = true;
 
   formants_button.innerHTML = `<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-  <span class="sr-only">Loading…</span>`;
+  <span class="visually-hidden">Loading…</span>`;
 };
 
 const not_loading = () => {
