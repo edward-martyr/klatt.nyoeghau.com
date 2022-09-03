@@ -43,8 +43,8 @@ class FormantDefaultValue(NamedTuple):
 
 
 FORMANT_DEFAULTS = {
-    1: FormantDefaultValue(800, 100, 1500),
-    2: FormantDefaultValue(1200, 500, 4000),
+    1: FormantDefaultValue(800, 100, 1250),
+    2: FormantDefaultValue(1200, 500, 3250),
     3: FormantDefaultValue(2300, 1000, 4500),
     # 4: 2800,
 }

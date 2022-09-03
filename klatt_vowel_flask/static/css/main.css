@@ -49,3 +49,13 @@ h1 {
 #wav_play_button:disabled {
   cursor: not-allowed;
 }
+
+#formant_plot {
+  width: min(100%, 300px);
+  height: 300px;
+  margin-bottom: 1rem;
+}
+
+#formant_plot svg tspan {
+  font-family: "Doulos SIL", "Gentium Plus", "Times New Roman", Times, serif;
+}

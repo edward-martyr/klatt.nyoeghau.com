@@ -7,12 +7,16 @@ function uuid4() {
   );
 }
 
-const audioCtx = new AudioContext();
-
 const formants_form = document.getElementById("formants_form");
 const formants_button = document.getElementById("formants_button");
 const wav_play_button = document.getElementById("wav_play_button");
 const loading_spinner = document.getElementById("loading_spinner");
+const formant_input_ranges = document.getElementsByClassName(
+  "formant_input_range"
+);
+const formant_input_1 = document.getElementById("formant_input_1");
+const formant_input_2 = document.getElementById("formant_input_2");
+const formant_plot = document.getElementById("formant_plot");
 
 const when_loading = () => {
   document.body.style.cursor = "progress";
@@ -40,6 +44,7 @@ const formants_button_event = (e) => {
   const urlSearchParams = new URLSearchParams(new FormData(formants_form));
   when_loading();
   fetch(`/process/${uuid}?${urlSearchParams}`).then((response) => {
+    const audioCtx = new AudioContext();
     fetch(`/wav/${uuid}`)
       .then((response) => response.arrayBuffer())
       .then((arrayBuffer) => audioCtx.decodeAudioData(arrayBuffer))
@@ -60,9 +65,134 @@ const formants_button_event = (e) => {
 };
 formants_button.addEventListener("click", formants_button_event);
 
-const formant_input_ranges = document.getElementsByClassName(
-  "formant_input_range"
-);
+const f1_min = new Number(formant_input_1.min);
+const f1_max = new Number(formant_input_1.max);
+const f2_min = new Number(formant_input_2.min);
+const f2_max = new Number(formant_input_2.max);
+
+const rem = parseFloat(getComputedStyle(document.body).fontSize);
+
+function f1_f2_to_coordinates(f1, f2) {
+  const y = (f1 - f1_min) / ((f1_max - f1_min) / 300) + 1;
+  const x = (-f2 + f2_max) / ((f2_max - f2_min) / 300) + 1;
+  return [x, y];
+}
+
+function plot_formants() {
+  const thinStrokeStyle = {
+    color: "#292b2c",
+    width: 1,
+    linecap: "sharp",
+    linejoin: "sharp",
+  };
+  const thickStrokeStyle = {
+    color: "#292b2c",
+    width: 2,
+    linecap: "sharp",
+    linejoin: "sharp",
+  };
+
+  var plot = SVG().addTo("#formant_plot");
+  plot.viewbox(0, 0, 300, 300);
+  plot.css({ overflow: "visible" });
+
+  var frame = plot
+    .polygon([
+      f1_f2_to_coordinates(f1_min, f2_min),
+      f1_f2_to_coordinates(f1_min, f2_max),
+      f1_f2_to_coordinates(f1_max, f2_max),
+      f1_f2_to_coordinates(f1_max, f2_min),
+    ])
+    .fill("none")
+    .stroke(thinStrokeStyle);
+
+  const highFrontCoord = f1_f2_to_coordinates(270, 2500);
+  const highBackCoord = f1_f2_to_coordinates(300, 600);
+  const lowBackCoord = f1_f2_to_coordinates(800, 1000);
+  const lowFrontCoord = f1_f2_to_coordinates(1000, 2000);
+
+  var vowelSpace = plot
+    .polygon([highFrontCoord, highBackCoord, lowBackCoord, lowFrontCoord])
+    .fill("none")
+    .stroke(thickStrokeStyle);
+
+  var highFront = plot
+    .text("i·y")
+    .move(highFrontCoord[0] - 15, highFrontCoord[1] - 20);
+  var highBack = plot
+    .text("ɯ·u")
+    .move(highBackCoord[0] - 20, highBackCoord[1] - 25);
+  var lowBack = plot.text("ɑ·ɒ").move(lowBackCoord[0] - 10, lowBackCoord[1]);
+  var lowFront = plot
+    .text("a·ɶ")
+    .move(lowFrontCoord[0] - 15, lowFrontCoord[1] - 5);
+
+  var formant_point = plot.circle(5).fill({ color: "#198754" });
+
+  var xLabel = plot.text("F2 (Hz)");
+  xLabel.move(
+    (f1_f2_to_coordinates(0, f2_min)[0] +
+      f1_f2_to_coordinates(0, f2_max)[0] -
+      xLabel.bbox().width) /
+      2,
+    f1_f2_to_coordinates(f1_max, 0)[1] + 5
+  );
+  var yLabel = plot.text("F1 (Hz)");
+  yLabel.move(
+    f1_f2_to_coordinates(0, f2_max)[0] - (rem + yLabel.bbox().width) / 2 - 5,
+    (f1_f2_to_coordinates(f1_min, 0)[1] +
+      f1_f2_to_coordinates(f1_max, 0)[1] -
+      yLabel.bbox().height) /
+      2
+  );
+  yLabel.rotate(-90);
+
+  var xMaxLabel = plot.text(f2_max.toString());
+  xMaxLabel.move(
+    f1_f2_to_coordinates(0, f2_max)[0],
+    f1_f2_to_coordinates(f1_max, 0)[1] + 5
+  );
+  var xMinLabel = plot.text(f2_min.toString());
+  xMinLabel.move(
+    f1_f2_to_coordinates(0, f2_min)[0] - xMinLabel.bbox().width,
+    f1_f2_to_coordinates(f1_max, 0)[1] + 5
+  );
+  var yMaxLabel = plot.text(f1_max.toString());
+  yMaxLabel.move(
+    f1_f2_to_coordinates(0, f2_max)[0] - (rem + yMaxLabel.bbox().width) / 2 - 5,
+    f1_f2_to_coordinates(f1_max, 0)[1] - yMaxLabel.bbox().height
+  );
+  yMaxLabel.rotate(-90);
+  var yMinLabel = plot.text(f1_min.toString());
+  yMinLabel.move(
+    f1_f2_to_coordinates(0, f2_max)[0] - (rem + yMinLabel.bbox().width) / 2 - 5,
+    f1_f2_to_coordinates(f1_min, 0)[1]
+  );
+  yMinLabel.rotate(-90);
+
+  var title = plot.text("Vowel Space");
+  title.move(
+    (f1_f2_to_coordinates(0, f2_min)[0] +
+      f1_f2_to_coordinates(0, f2_max)[0] -
+      title.bbox().width) /
+      2,
+    f1_f2_to_coordinates(f1_max, 0)[1] - 5 - title.bbox().height
+  );
+
+  var shade = plot
+    .polygon([
+      f1_f2_to_coordinates(f2_min, f2_min),
+      f1_f2_to_coordinates(f1_max, f1_max),
+      f1_f2_to_coordinates(f1_max, f2_min),
+    ])
+    .fill("#adb5bd");
+  // test.move(...f1_f2_to_coordinates(f2_min, f2_min));
+  // test.move(...f1_f2_to_coordinates(f1_max, f1_max));
+
+  return formant_point;
+}
+
+const formant_point = plot_formants();
 
 for (let i = 0; i < formant_input_ranges.length; i++) {
   const formant_input_range = formant_input_ranges[i];
@@ -101,7 +231,14 @@ for (let i = 0; i < formant_input_ranges.length; i++) {
         }
       }
     }
+
+    if (f == 1 || f == 2) {
+      formant_point.move(
+        ...f1_f2_to_coordinates(formant_input_1.value, formant_input_2.value)
+      );
+    }
   };
 
   formant_input_range.addEventListener("input", eventListener);
+  formant_input_range.dispatchEvent(new Event("input"));
 }
