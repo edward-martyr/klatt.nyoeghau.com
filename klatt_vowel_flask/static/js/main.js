@@ -91,6 +91,9 @@ function plot_formants() {
     linecap: "sharp",
     linejoin: "sharp",
   };
+  const anchorMiddleStyle = {
+    anchor: "middle",
+  };
 
   var plot = SVG().addTo("#formant_plot");
   plot.viewbox(0, 0, 300, 300);
@@ -103,7 +106,7 @@ function plot_formants() {
       f1_f2_to_coordinates(f1_max, f2_max),
       f1_f2_to_coordinates(f1_max, f2_min),
     ])
-    .fill("none")
+    .fill("#f8f9fA")
     .stroke(thinStrokeStyle);
 
   const highFrontCoord = f1_f2_to_coordinates(270, 2500);
@@ -113,71 +116,89 @@ function plot_formants() {
 
   var vowelSpace = plot
     .polygon([highFrontCoord, highBackCoord, lowBackCoord, lowFrontCoord])
-    .fill("none")
+    .fill("#fff")
     .stroke(thickStrokeStyle);
 
   var highFront = plot
     .text("i·y")
-    .move(highFrontCoord[0] - 15, highFrontCoord[1] - 20);
+    .move(highFrontCoord[0] - 10, highFrontCoord[1] - 20)
+    .font(anchorMiddleStyle);
   var highBack = plot
     .text("ɯ·u")
-    .move(highBackCoord[0] - 20, highBackCoord[1] - 25);
-  var lowBack = plot.text("ɑ·ɒ").move(lowBackCoord[0] - 10, lowBackCoord[1]);
+    .move(highBackCoord[0] - 10, highBackCoord[1] - 25)
+    .font(anchorMiddleStyle);
+  var lowBack = plot
+    .text("ɑ·ɒ")
+    .move(lowBackCoord[0], lowBackCoord[1])
+    .font(anchorMiddleStyle);
   var lowFront = plot
     .text("a·ɶ")
-    .move(lowFrontCoord[0] - 15, lowFrontCoord[1] - 5);
+    .move(lowFrontCoord[0], lowFrontCoord[1] - 5)
+    .font(anchorMiddleStyle);
 
-  var formant_point = plot.circle(5).fill({ color: "#198754" });
+  var formant_point = plot.circle(5).fill("#dc3545");
 
   var xLabel = plot.text("F2 (Hz)");
-  xLabel.move(
-    (f1_f2_to_coordinates(0, f2_min)[0] +
-      f1_f2_to_coordinates(0, f2_max)[0] -
-      xLabel.bbox().width) /
-      2,
-    f1_f2_to_coordinates(f1_max, 0)[1] + 5
-  );
+  xLabel
+    .move(
+      (f1_f2_to_coordinates(0, f2_min)[0] +
+        f1_f2_to_coordinates(0, f2_max)[0]) /
+        2,
+      f1_f2_to_coordinates(f1_max, 0)[1]
+    )
+    .font(anchorMiddleStyle);
   var yLabel = plot.text("F1 (Hz)");
-  yLabel.move(
-    f1_f2_to_coordinates(0, f2_max)[0] - (rem + yLabel.bbox().width) / 2 - 5,
-    (f1_f2_to_coordinates(f1_min, 0)[1] +
-      f1_f2_to_coordinates(f1_max, 0)[1] -
-      yLabel.bbox().height) /
-      2
-  );
+  yLabel
+    .move(
+      f1_f2_to_coordinates(0, f2_max)[0] - yLabel.bbox().height / 2,
+      (f1_f2_to_coordinates(f1_min, 0)[1] +
+        f1_f2_to_coordinates(f1_max, 0)[1] -
+        yLabel.bbox().height) /
+        2
+    )
+    .font(anchorMiddleStyle);
   yLabel.rotate(-90);
 
   var xMaxLabel = plot.text(f2_max.toString());
-  xMaxLabel.move(
-    f1_f2_to_coordinates(0, f2_max)[0],
-    f1_f2_to_coordinates(f1_max, 0)[1] + 5
-  );
+  xMaxLabel
+    .move(
+      f1_f2_to_coordinates(0, f2_max)[0] + xMaxLabel.bbox().width / 2,
+      f1_f2_to_coordinates(f1_max, 0)[1]
+    )
+    .font(anchorMiddleStyle);
   var xMinLabel = plot.text(f2_min.toString());
-  xMinLabel.move(
-    f1_f2_to_coordinates(0, f2_min)[0] - xMinLabel.bbox().width,
-    f1_f2_to_coordinates(f1_max, 0)[1] + 5
-  );
+  xMinLabel
+    .move(
+      f1_f2_to_coordinates(0, f2_min)[0] - xMinLabel.bbox().width / 2,
+      f1_f2_to_coordinates(f1_max, 0)[1]
+    )
+    .font(anchorMiddleStyle);
   var yMaxLabel = plot.text(f1_max.toString());
-  yMaxLabel.move(
-    f1_f2_to_coordinates(0, f2_max)[0] - (rem + yMaxLabel.bbox().width) / 2 - 5,
-    f1_f2_to_coordinates(f1_max, 0)[1] - yMaxLabel.bbox().height
-  );
+  yMaxLabel
+    .move(
+      f1_f2_to_coordinates(0, f2_max)[0] - yMaxLabel.bbox().height / 2,
+      f1_f2_to_coordinates(f1_max, 0)[1] - yMaxLabel.bbox().height
+    )
+    .font(anchorMiddleStyle);
   yMaxLabel.rotate(-90);
   var yMinLabel = plot.text(f1_min.toString());
-  yMinLabel.move(
-    f1_f2_to_coordinates(0, f2_max)[0] - (rem + yMinLabel.bbox().width) / 2 - 5,
-    f1_f2_to_coordinates(f1_min, 0)[1]
-  );
+  yMinLabel
+    .move(
+      f1_f2_to_coordinates(0, f2_max)[0] - yMinLabel.bbox().height / 2,
+      f1_f2_to_coordinates(f1_min, 0)[1]
+    )
+    .font(anchorMiddleStyle);
   yMinLabel.rotate(-90);
 
   var title = plot.text("Vowel Space");
-  title.move(
-    (f1_f2_to_coordinates(0, f2_min)[0] +
-      f1_f2_to_coordinates(0, f2_max)[0] -
-      title.bbox().width) /
-      2,
-    f1_f2_to_coordinates(f1_max, 0)[1] - 5 - title.bbox().height
-  );
+  title
+    .move(
+      (f1_f2_to_coordinates(0, f2_min)[0] +
+        f1_f2_to_coordinates(0, f2_max)[0]) /
+        2,
+      f1_f2_to_coordinates(f1_max, 0)[1] - title.bbox().height
+    )
+    .font(anchorMiddleStyle);
 
   var shade = plot
     .polygon([
