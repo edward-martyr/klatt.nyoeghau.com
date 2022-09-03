@@ -79,13 +79,15 @@ def process(uuid: str):
 
         save_sound_as_wav(audio, save_path.as_posix())
 
-        return json_response | {"success": True}, 201  # , {"Location": f"/wav/{uuid}"}
+        json_response.update({"success": True})
+        return json_response, 201  # , {"Location": f"/wav/{uuid}"}
     except Exception as e:
         app.logger.error(
             f"{e}. Error processing request for {uuid}, {request.args}.",
             exc_info=True,
         )
-        return json_response | {"success": False}, 500
+        json_response.update({"success": False, "error": str(e)})
+        return json_response, 500
 
 
 @app.route("/wav/<path:uuid>")
