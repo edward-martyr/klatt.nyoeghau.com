@@ -14,6 +14,8 @@
     <main>
         {% block content %}{% endblock %}
     </main>
+    <div id="copyright" class="container-sm"></div>
+    <script src="{{ url_for('static', filename='js/base.js') }}"></script>
     {% block script %}{% endblock %}
 </body>
 

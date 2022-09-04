@@ -45,7 +45,7 @@ const formants_button_event = (e) => {
   when_loading();
   fetch(`/process/${uuid}`, {
     method: "POST",
-    form: formantsFormData,
+    body: formantsFormData,
   }).then((response) => {
     const audioCtx = new AudioContext();
     fetch(`/wav/${uuid}`)

@@ -2,7 +2,7 @@
   font-family: sans-serif;
 }
 
-main {
+body {
   max-width: min(70%, 960px);
   margin: 5% auto;
 }
@@ -58,4 +58,11 @@ h1 {
 
 #formant_plot svg tspan {
   font-family: "Doulos SIL", "Gentium Plus", "Times New Roman", Times, serif;
+}
+
+#copyright {
+  margin-top: 2rem;
+  font-size: small;
+  text-align: right;
+  color: #6c757d;
 }
