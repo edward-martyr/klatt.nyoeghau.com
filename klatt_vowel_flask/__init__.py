@@ -64,7 +64,7 @@ def index():
     return render_template("index.html", formant_inputs=formant_inputs)
 
 
-@app.route("/process/<path:uuid>")
+@app.route("/process/<path:uuid>", methods=["POST"])
 @reject_outside_referrers
 def process(uuid: str):
     json_response = {}  # {"uuid": uuid, "args": request.args}
