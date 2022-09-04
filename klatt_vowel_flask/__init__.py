@@ -69,7 +69,7 @@ def index():
 def process(uuid: str):
     json_response = {}  # {"uuid": uuid, "args": request.args}
     try:
-        formants = (float(request.args.get(f"f{i}", 0)) for i in FORMANT_NUMBER_RANGE)
+        formants = (float(request.form.get(f"f{i}", 0)) for i in FORMANT_NUMBER_RANGE)
         klatt_grid = create_klattgrid_from_vowel(*formants)
         audio = klattgrid_to_sound(klatt_grid)
 
@@ -86,7 +86,7 @@ def process(uuid: str):
             f"{e}. Error processing request for {uuid}, {request.args}.",
             exc_info=True,
         )
-        json_response.update({"success": False, "error": str(e)})
+        json_response.update({"success": False, "error": str(e), "form": request.form})
         return json_response, 500
 
 

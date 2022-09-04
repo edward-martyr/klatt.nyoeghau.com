@@ -41,29 +41,30 @@ const not_loading = () => {
 
 const formants_button_event = (e) => {
   const uuid = uuid4();
-  const urlSearchParams = new URLSearchParams(new FormData(formants_form));
+  const formantsFormData = new FormData(formants_form);
   when_loading();
-  fetch(`/process/${uuid}?${urlSearchParams}`, { method: "POST" }).then(
-    (response) => {
-      const audioCtx = new AudioContext();
-      fetch(`/wav/${uuid}`)
-        .then((response) => response.arrayBuffer())
-        .then((arrayBuffer) => audioCtx.decodeAudioData(arrayBuffer))
-        .then((decodedAudioData) => {
-          const audio_data = decodedAudioData;
-          function play_audio() {
-            const source = audioCtx.createBufferSource();
-            source.buffer = audio_data;
-            source.connect(audioCtx.destination);
-            source.start(0);
-          }
-          // play_audio();
-          not_loading();
-          wav_play_button.hidden = false;
-          wav_play_button.onclick = play_audio;
-        });
-    }
-  );
+  fetch(`/process/${uuid}`, {
+    method: "POST",
+    form: formantsFormData,
+  }).then((response) => {
+    const audioCtx = new AudioContext();
+    fetch(`/wav/${uuid}`)
+      .then((response) => response.arrayBuffer())
+      .then((arrayBuffer) => audioCtx.decodeAudioData(arrayBuffer))
+      .then((decodedAudioData) => {
+        const audio_data = decodedAudioData;
+        function play_audio() {
+          const source = audioCtx.createBufferSource();
+          source.buffer = audio_data;
+          source.connect(audioCtx.destination);
+          source.start(0);
+        }
+        // play_audio();
+        not_loading();
+        wav_play_button.hidden = false;
+        wav_play_button.onclick = play_audio;
+      });
+  });
 };
 formants_button.addEventListener("click", formants_button_event);
 
