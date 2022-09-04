@@ -79,14 +79,26 @@ function f1_f2_to_coordinates(f1, f2) {
 }
 
 function plot_formants() {
+  const dark = "#292b2c";
+  const lightGrey = "#f8f9fA";
+  const darkGrey = "#dee2e5";
+  const white = "#fff";
+  const red = "#dc3545";
+
   const thinStrokeStyle = {
-    color: "#292b2c",
+    color: dark,
+    width: 1,
+    linecap: "sharp",
+    linejoin: "sharp",
+  };
+  const thinGreyStrokeStyle = {
+    color: darkGrey,
     width: 1,
     linecap: "sharp",
     linejoin: "sharp",
   };
   const thickStrokeStyle = {
-    color: "#292b2c",
+    color: dark,
     width: 2,
     linecap: "sharp",
     linejoin: "sharp",
@@ -106,7 +118,7 @@ function plot_formants() {
       f1_f2_to_coordinates(f1_max, f2_max),
       f1_f2_to_coordinates(f1_max, f2_min),
     ])
-    .fill("#f8f9fA")
+    .fill(lightGrey)
     .stroke(thinStrokeStyle);
 
   const highFrontCoord = f1_f2_to_coordinates(270, 2500);
@@ -116,8 +128,17 @@ function plot_formants() {
 
   var vowelSpace = plot
     .polygon([highFrontCoord, highBackCoord, lowBackCoord, lowFrontCoord])
-    .fill("#fff")
+    .fill(white)
     .stroke(thickStrokeStyle);
+
+  var shade = plot
+    .polygon([
+      f1_f2_to_coordinates(f2_min, f2_min),
+      f1_f2_to_coordinates(f1_max, f1_max),
+      f1_f2_to_coordinates(f1_max, f2_min),
+    ])
+    .fill(darkGrey)
+    .stroke(thinGreyStrokeStyle);
 
   var highFront = plot
     .text("i·y")
@@ -136,7 +157,7 @@ function plot_formants() {
     .move(lowFrontCoord[0], lowFrontCoord[1] - 5)
     .font(anchorMiddleStyle);
 
-  var formant_point = plot.circle(5).fill("#dc3545");
+  var formant_point = plot.circle(5).fill(red);
 
   var xLabel = plot.text("F2 (Hz)");
   xLabel
@@ -200,16 +221,6 @@ function plot_formants() {
     )
     .font(anchorMiddleStyle);
 
-  var shade = plot
-    .polygon([
-      f1_f2_to_coordinates(f2_min, f2_min),
-      f1_f2_to_coordinates(f1_max, f1_max),
-      f1_f2_to_coordinates(f1_max, f2_min),
-    ])
-    .fill("#adb5bd");
-  // test.move(...f1_f2_to_coordinates(f2_min, f2_min));
-  // test.move(...f1_f2_to_coordinates(f1_max, f1_max));
-
   return formant_point;
 }
 
@@ -254,7 +265,7 @@ for (let i = 0; i < formant_input_ranges.length; i++) {
     }
 
     if (f == 1 || f == 2) {
-      formant_point.move(
+      formant_point.center(
         ...f1_f2_to_coordinates(formant_input_1.value, formant_input_2.value)
       );
     }
