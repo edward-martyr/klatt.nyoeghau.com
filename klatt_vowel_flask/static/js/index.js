@@ -30,7 +30,7 @@ const when_loading = () => {
 };
 
 const not_loading = () => {
-  document.body.style.cursor = "default";
+  document.body.style.cursor = "inherit";
   formants_button.style.cursor = "pointer";
   wav_play_button.style.cursor = "pointer";
   formants_button.disabled = false;

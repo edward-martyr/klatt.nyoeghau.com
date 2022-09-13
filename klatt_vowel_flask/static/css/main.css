@@ -1,9 +1,14 @@
 * {
   font-family: sans-serif;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 body {
-  max-width: min(70%, 960px);
+  max-width: min(max(40%, 40rem), 70%);
   margin: 5% auto;
 }
 
@@ -27,7 +32,7 @@ h1 {
 }
 
 .formant_input_range {
-  width: max(20%, 10rem);
+  width: min(max(50%, 10rem), 100%);
 }
 
 .formant_input {
@@ -43,7 +48,7 @@ h1 {
 #wav_play_button {
   margin-left: 0.2rem;
   margin-bottom: 1rem;
-  width: max(20%, 10rem);
+  width: min(max(40%, 10rem), 80%);
 }
 
 #wav_play_button:disabled {
@@ -53,7 +58,7 @@ h1 {
 #formant_plot {
   width: min(100%, 300px);
   height: 300px;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 #formant_plot svg tspan {
@@ -65,4 +70,15 @@ h1 {
   font-size: small;
   text-align: right;
   color: #6c757d;
+}
+
+#more {
+  margin-top: 1rem;
+  width: min(40rem, 100%);
+  font-size: small;
+  text-align: left;
+}
+
+.sc {
+  font-feature-settings: "smcp";
 }

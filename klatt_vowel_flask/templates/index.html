@@ -13,11 +13,44 @@
     <button type="button" class="btn btn-primary" id="wav_play_button" disabled>Play</button>
 </form>
 
-<svg id="formant_plot" style="overflow: visible"></svg>
+<div>
+    <svg id="formant_plot" style="overflow: visible"></svg>
+</div>
 
+<div>
+    <div class="accordion" id="more">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    About KlattGrid Speech Synthesiser
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                data-bs-parent="#more">
+                <div class="accordion-body">
+                    <p>
+                        Klatt Grid Vowel Synthesis uses <cite>KlattGrid Speech Synthesizer</cite> from praat as its
+                        backend to synthesise vowels.
+                    </p>
+                    <ul>
+                        <li>Weenink, D. (2009) <cite>The klattgrid speech synthesizer.</cite> Proc. Interspeech 2009,
+                            2059-2062,
+                            <span class="sc">doi</span>: <a href="https://doi.org/10.21437/Interspeech.2009-591"
+                                target="_blank">10.21437/Interspeech.2009-591</a>.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block script %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js"
+    integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK"
+    crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}
